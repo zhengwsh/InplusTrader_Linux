@@ -1,0 +1,62 @@
+{
+    "base": {
+        "run_id": 9999,
+        "strategy_file": "",
+        "start_date": "2016-01-01",
+        "end_date": "2017-01-01",
+        "stock_starting_cash": 100000,
+        "securities": ["stock"],
+        "margin_multiplier": 1,
+        "run_type": "b",
+        "frequency": "1d",
+        "benchmark": "000300.XSHG",
+        "resume_mode": false,
+        "persist": false,
+        "persist_mode": "real_time",
+        "handle_split": false,
+        "matching_type": "current_bar",
+        "slippage": 0.05,
+        "commission_multiplier": 1
+    },
+    "extra": {
+        "log_level": "verbose",
+        "user_system_log_disabled": false,
+        "context_vars": false,
+        "force_run_init_when_pt_resume": false,
+        "enable_profiler": false,
+        "is_hold": false,
+        "locale": "zh_Hans_CN"
+    },
+    "validator": {
+        "cash_return_by_stock_delisted": false,
+        "close_amount": true
+    },
+    "mod": {
+        "sys_inplustrader": {
+            "enabled": true,
+            "signal": false,
+            "matching_type": "current_bar",
+            "slippage": 0.05,
+            "commission_multiplier": 1,
+            "price_limit": true,
+            "volume_limit": true,
+            "volume_percent": 0.25,
+            "mongo": ""
+        },
+        "sys_analyser": {
+            "enabled": true,
+            "record": true,
+            "output_file": "",
+            "report_save_path": "",
+            "plot": true,
+            "plot_save_file": ""
+        },
+        "sys_risk": {
+            "enabled": false,
+            "validate_price": true,
+            "validate_is_trading": true,
+            "validate_cash": true,
+            "validate_position": true
+        }
+    }
+}

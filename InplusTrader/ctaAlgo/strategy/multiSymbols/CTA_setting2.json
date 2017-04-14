@@ -1,0 +1,11 @@
+[
+    
+   {
+        "name": "tradeTest",
+        "className": "tradeTest",
+        "vtSymbol": "IF1606,IC1606",
+		"longSymbol": "IF1606",
+		"shortSymbol": "IC1606"
+    }
+
+]

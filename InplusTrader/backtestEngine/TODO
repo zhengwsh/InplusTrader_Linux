@@ -1,0 +1,14 @@
+思路：
+先将bcolz导入Mongo
+
+
+
+每天从RQ更新bundle将bcolz导入Mongo （仅有各合约日数据）
+
+使用DataEngine更新历史tick、minute数据
+
+使用Data Recorder更新实时tick、minute数据
+
+实现mod对接mongo 进行回测
+
+inplus trader 进行CTA模拟盘、实盘

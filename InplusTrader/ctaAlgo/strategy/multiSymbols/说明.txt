@@ -1,0 +1,30 @@
+文件目录
+
+ctaAlgo目录
+CTA_setting2.json
+ctaEngine2
+ctaTemplate2
+ctaTradeTest
+
+根目录
+vtEngine2
+ctaTestMain
+
+1、多合约配置
+修改CTA_setting2.json的vtSymbol，使用“,”分割
+"vtSymbol": "IF1606,IC1606",
+
+2、修改ctaSetting.py
+from ctaTradeTest import tradeTest
+STRATEGY_CLASS['tradeTest'] = tradeTest
+
+3、在python下运行ctaTestMain.py。无界面直接运行策略。
+
+
+
+实现思路
+通过ctaEngine2的loadStrategy实现一个策略对应多个合约订阅。配套修改ctaTemplate2合约和仓位变量，实现多合约信息存储。修改发单方法，增加合约名称参数，原有方法直接使用全局变量合约名。
+
+因为使用了mysql数据库，引擎中会import MySQLdb。
+
+使用最新的版本进行修改，可以与新版本的引擎文件对比查看修改的位置。
