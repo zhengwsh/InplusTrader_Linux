@@ -15,7 +15,7 @@ sharpe,-3.704
 sortino,-3.67
 start_date,2016-01-04
 stock_starting_cash,100000
-strategy_file,/home/vinson/Downloads/InplusTrader-master/InplusTrader/stockBacktest/strategy/macd.py
+strategy_file,/home/vinson/PycharmProjects/InplusTrader_Linux/InplusTrader/stockBacktest/strategy/macd.py
 strategy_name,macd
 total_returns,-0.641
 total_value,35880.554

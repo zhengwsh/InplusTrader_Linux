@@ -57,6 +57,11 @@
             "validate_is_trading": true,
             "validate_cash": true,
             "validate_position": true
+        },
+        "extend_api_demo": {
+            "enabled": true,
+            "lib": "rqalpha.examples.extend_api.rqalpha_mod_extend_api_demo",
+            "csv_path": "../IF1706_20161108.csv"
         }
     }
 }
