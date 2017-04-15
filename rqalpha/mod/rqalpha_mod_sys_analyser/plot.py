@@ -90,6 +90,7 @@ def plot_result(result_dict, show_windows=True, savefile=None):
     max_height = 10 + plots_area_size
     gs = gridspec.GridSpec(max_height, 8)
 
+    '''
     # draw logo
     ax = plt.subplot(gs[:3, -1:])
     ax.axis("off")
@@ -98,6 +99,7 @@ def plot_result(result_dict, show_windows=True, savefile=None):
     img = mpimg.imread(filename)
     ax.imshow(img, interpolation="nearest")
     ax.autoscale_view()
+    '''
 
     # draw risk and portfolio
 
