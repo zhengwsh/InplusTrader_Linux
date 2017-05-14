@@ -1,10 +1,10 @@
 
-======================================
-InplusTrader Documentation Instruction
-======================================
+=================================
+RQAlpha Documentation Instruction
+=================================
 
 
-InplusTrader 使用 Sphinx 进行文档编写。
+RQAlpha 使用 Sphinx 进行文档编写。
 
 
 Requirements
