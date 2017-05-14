@@ -89,9 +89,9 @@ qthelp:
 	@echo
 	@echo "Build finished; now you can run "qcollectiongenerator" with the" \
 	      ".qhcp project file in $(BUILDDIR)/qthelp, like this:"
-	@echo "# qcollectiongenerator $(BUILDDIR)/qthelp/rqalpha.qhcp"
+	@echo "# qcollectiongenerator $(BUILDDIR)/qthelp/InplusTrader.qhcp"
 	@echo "To view the help file:"
-	@echo "# assistant -collectionFile $(BUILDDIR)/qthelp/rqalpha.qhc"
+	@echo "# assistant -collectionFile $(BUILDDIR)/qthelp/InplusTrader.qhc"
 
 .PHONY: applehelp
 applehelp:
@@ -108,8 +108,8 @@ devhelp:
 	@echo
 	@echo "Build finished."
 	@echo "To view the help file:"
-	@echo "# mkdir -p $$HOME/.local/share/devhelp/rqalpha"
-	@echo "# ln -s $(BUILDDIR)/devhelp $$HOME/.local/share/devhelp/rqalpha"
+	@echo "# mkdir -p $$HOME/.local/share/devhelp/InplusTrader"
+	@echo "# ln -s $(BUILDDIR)/devhelp $$HOME/.local/share/devhelp/InplusTrader"
 	@echo "# devhelp"
 
 .PHONY: epub
