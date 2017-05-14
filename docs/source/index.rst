@@ -16,14 +16,12 @@ InplusTrader 结合最新人工智能、机器学习等技术，助力量化投�
 特点
 ============================
 
-======================    ==========================================================================================
-易于使用
-稳定的环境
-灵活的配置
-强大的扩展性
-======================    ==========================================================================================
+*   易于使用
+*   稳定的环境
+*   灵活的配置
+*   强大的扩展性
 
-Feature Status
+项目状态
 ============================
 
 *   Third-party Tools Integration
@@ -55,20 +53,15 @@ Feature Status
 .. _InplusLab: http://inpluslab.sysu.edu.cn
 .. _InplusTrader 文档: http://inplustrader.readthedocs.io/zh_CN/latest/
 
-.. _RQAlpha 介绍: http://rqalpha.readthedocs.io/zh_CN/latest/intro/overview.html
-.. _安装指南: http://rqalpha.readthedocs.io/zh_CN/latest/intro/install.html
-.. _10分钟学会 RQAlpha: http://rqalpha.readthedocs.io/zh_CN/latest/intro/tutorial.html
-.. _策略示例: http://rqalpha.readthedocs.io/zh_CN/latest/intro/examples.html
+.. _InplusTrader 介绍: http://inplustrader.readthedocs.io/zh_CN/latest/intro/overview.html
+.. _安装指南: http://inplustrader.readthedocs.io/zh_CN/latest/intro/install.html
+.. _10分钟学会 RQAlpha: http://inplustrader.readthedocs.io/zh_CN/latest/intro/tutorial.html
+.. _策略示例: http://inplustrader.readthedocs.io/zh_CN/latest/intro/examples.html
 
-.. _API: http://rqalpha.readthedocs.io/zh_CN/latest/api/base_api.html
+.. _API: http://inplustrader.readthedocs.io/zh_CN/latest/api/base_api.html
 
-.. _如何贡献代码: http://rqalpha.readthedocs.io/zh_CN/latest/development/make_contribute.html
-.. _基本概念: http://rqalpha.readthedocs.io/zh_CN/latest/development/basic_concept.html
-.. _RQAlpha 基于 Mod 进行扩展: http://rqalpha.readthedocs.io/zh_CN/latest/development/mod.html
-.. _History: http://rqalpha.readthedocs.io/zh_CN/latest/history.html
-.. _TODO: https://github.com/ricequant/rqalpha/blob/master/TODO.md
-.. _develop 分支: https://github.com/ricequant/rqalpha/tree/develop
-.. _master 分支: https://github.com/ricequant/rqalpha
+.. _TODO: https://github.com/ricequant/InplusTrader_Linux/blob/master/TODO.md
+.. _master 分支: https://github.com/zhengwsh/InplusTrader_Linux
 
 .. _keras: http://keras.io
 
