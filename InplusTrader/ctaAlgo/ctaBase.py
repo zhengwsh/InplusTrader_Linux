@@ -31,9 +31,13 @@ STOPORDERPREFIX = 'CtaStopOrder.'
 SETTING_DB_NAME = 'InplusTrader_Setting_Db'
 POSITION_DB_NAME = 'InplusTrader_Position_Db'
 
-TICK_DB_NAME = 'InplusTrader_Tick_Db'
-DAILY_DB_NAME = 'InplusTrader_Daily_Db'
-MINUTE_DB_NAME = 'InplusTrader_1Min_Db'
+# TICK_DB_NAME = 'InplusTrader_Tick_Db'
+# DAILY_DB_NAME = 'InplusTrader_Daily_Db'
+# MINUTE_DB_NAME = 'InplusTrader_1Min_Db'
+
+TICK_DB_NAME = 'InFintech_Db'
+DAILY_DB_NAME = 'InplusTrader_Futures_Day_Db'
+MINUTE_DB_NAME = 'InplusTrader_Futures_Min_Db'
 
 # 引擎类型，用于区分当前策略的运行环境
 ENGINETYPE_BACKTESTING = 'backtesting'  # 回测
@@ -133,4 +137,31 @@ class CtaTickData(object):
         self.askVolume2 = EMPTY_INT
         self.askVolume3 = EMPTY_INT
         self.askVolume4 = EMPTY_INT
-        self.askVolume5 = EMPTY_INT    
+        self.askVolume5 = EMPTY_INT
+
+
+########################################################################
+class CtaTickData1(object):
+    """Tick数据"""
+
+    #----------------------------------------------------------------------
+    def __init__(self):
+        """Constructor"""
+        self.askPrice1 = EMPTY_FLOAT
+        self.lowPrice = EMPTY_FLOAT
+        self.price = EMPTY_FLOAT
+        self.limit_up = EMPTY_FLOAT
+        self.bidPrice1 = EMPTY_FLOAT
+        self.openPrice = EMPTY_FLOAT
+        self.datetime = EMPTY_STRING
+        self.volume = EMPTY_INT
+        self.preClosePrice = EMPTY_FLOAT
+        self.bidVolume1 = EMPTY_INT
+        self.time = EMPTY_STRING
+        self.date = EMPTY_STRING
+        self.askVolume1 = EMPTY_INT
+        self.open_interest = EMPTY_FLOAT
+        self.highPrice = EMPTY_FLOAT
+        self.limit_down = EMPTY_FLOAT
+        self.total_volume = EMPTY_INT
+

@@ -4,15 +4,15 @@
 created by vinson zheng
 """
 
-from ctaBase import *
-from ctaTemplate import CtaTemplate
+from ..ctaBase import *
+from ..ctaTemplate import CtaTemplate
 import numpy as np
 
 
 ########################################################################
-class strategyPairTrading(CtaTemplate):
+class PairTradingStrategy(CtaTemplate):
     """期货配对交易策略Demo"""
-    className = 'strategyPairTrading'
+    className = 'PairTradingStrategy'
     author = u'Vinson Zheng'
     
     # 策略参数
@@ -59,7 +59,7 @@ class strategyPairTrading(CtaTemplate):
     #----------------------------------------------------------------------
     def __init__(self, ctaEngine, setting):
         """Constructor"""
-        super(strategyPairTrading, self).__init__(ctaEngine, setting)
+        super(PairTradingStrategy, self).__init__(ctaEngine, setting)
         
         # 注意策略类中的可变对象属性（通常是list和dict等），在策略初始化时需要重新创建，
         # 否则会出现多个策略实例之间数据共享的情况，有可能导致潜在的策略逻辑错误风险，

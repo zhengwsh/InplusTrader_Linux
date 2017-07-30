@@ -1,0 +1,16 @@
+[
+    {
+        "name": "I",
+        "mRate": 1,
+        "mPrice": 1,
+        "mSize": 1,
+        "mLevel": 1
+    },
+    {
+    	"name": "RB",
+        "mRate": 1,
+        "mPrice": 1,
+        "mSize": 1,
+        "mLevel": 1
+    }
+]

@@ -2,18 +2,21 @@
     {
         "name": "atr rsi",
         "className": "AtrRsiStrategy",
-        "vtSymbols": ["IC1706"]
+        "vtSymbol": ["IC1706"]
     },
     {
     	"name": "ema",
         "className": "EmaDemoStrategy",
         "author": "Vinson Zheng",
-        "vtSymbols": [ "cu1705" ]
+        "vtSymbol": [ "cu1705" ]
     },
     {
     	"name": "pair trading",
-        "className": "PairTradingStrategy",
+        "className": "PairTradingStrategy1",
         "author": "Vinson Zheng",
-        "vtSymbols": [ "rb1705" , "bu1705"]
+        "vtSymbol": "I88",
+        "vtSymbol1": "I88",
+        "StartTime": "2014-12-23 13:31:00",
+        "EndTime": "2014-12-23 14:20:00"
     }
 ]

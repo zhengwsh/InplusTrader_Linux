@@ -187,7 +187,7 @@ class DrEngine(object):
                 bar.volume = drTick.volume
                 bar.openInterest = drTick.openInterest        
             # 否则继续累加新的K线
-            else:                               
+            else:
                 bar.high = max(bar.high, drTick.lastPrice)
                 bar.low = min(bar.low, drTick.lastPrice)
                 bar.close = drTick.lastPrice            
@@ -201,7 +201,7 @@ class DrEngine(object):
     def insertData(self, dbName, collectionName, data):
         """插入数据到数据库（这里的data可以是CtaTickData或者CtaBarData）"""
         self.queue.put((dbName, collectionName, data.__dict__))
-        
+
     #----------------------------------------------------------------------
     def run(self):
         """运行插入线程"""

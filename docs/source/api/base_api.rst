@@ -26,7 +26,7 @@ init
         :linenos:
 
         def init(context):
-            # cash_limit的属性是根据用户需求自己定义的，你可以定义无限多种自己随后需要的属性，ricequant的系统默认只是会占用context.portfolio的关键字来调用策略的投资组合信息
+            # cash_limit的属性是根据用户需求自己定义的，你可以定义无限多种自己随后需要的属性，系统默认只是会占用context.portfolio的关键字来调用策略的投资组合信息
             context.cash_limit = 5000
 
 handle_bar

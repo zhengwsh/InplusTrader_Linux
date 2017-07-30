@@ -23,8 +23,8 @@ from collections import OrderedDict
 from datetime import datetime, timedelta
 
 from ctaBase import *
-from ctaSetting import STRATEGY_CLASS
-#from strategy import STRATEGY_CLASS
+# from ctaSetting import STRATEGY_CLASS
+from strategy import STRATEGY_CLASS
 from eventEngine import *
 from vtConstant import *
 from vtGateway import VtSubscribeReq, VtOrderReq, VtCancelOrderReq, VtLogData
@@ -517,7 +517,7 @@ class CtaEngine(object):
             return paramDict
         else:
             self.writeCtaLog(u'策略实例不存在：' + name)    
-            return None   
+            return None
         
     #----------------------------------------------------------------------
     def putStrategyEvent(self, name):

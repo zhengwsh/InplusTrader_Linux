@@ -11,8 +11,8 @@
 """
 
 
-from ctaBase import *
-from ctaTemplate import CtaTemplate
+from ..ctaBase import *
+from ..ctaTemplate import CtaTemplate
 
 import talib
 import numpy as np
@@ -60,7 +60,7 @@ class AtrRsiStrategy(CtaTemplate):
     paramList = ['name',
                  'className',
                  'author',
-                 'vtSymbol',
+                 'vtSymbols',
                  'atrLength',
                  'atrMaLength',
                  'rsiLength',

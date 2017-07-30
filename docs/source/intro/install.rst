@@ -56,5 +56,3 @@
 ..  code-block:: bash
 
     git clone http://github.com/zhengwsh/InplusTrader_Linux.git
-
-

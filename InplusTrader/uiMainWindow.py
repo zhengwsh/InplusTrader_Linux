@@ -400,6 +400,7 @@ class LoginCTPWidget(QtGui.QDialog):
         buttonLogin = QtGui.QPushButton(u'登录')
         buttonCancel = QtGui.QPushButton(u'取消')
         buttonLogin.clicked.connect(self.login)
+        self.editUserID.returnPressed.connect(self.login)
         buttonCancel.clicked.connect(self.close)
 
         # 设置布局
@@ -514,6 +515,7 @@ class MongoWidget(QtGui.QDialog):
         buttonConnect = QtGui.QPushButton(u'连接')
         buttonCancel = QtGui.QPushButton(u'取消')
         buttonConnect.clicked.connect(self.connect)
+        self.editIp.returnPressed.connect(self.connect)
         buttonCancel.clicked.connect(self.close)
 
         # 设置布局

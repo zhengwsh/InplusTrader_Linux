@@ -93,7 +93,7 @@ class BacktestingEngine(object):
         self.initDays = initDays
         
         self.dataStartDate = datetime.strptime(startDate, '%Y%m%d')
-        
+
         initTimeDelta = timedelta(initDays)
         self.strategyStartDate = self.dataStartDate + initTimeDelta
         
@@ -104,9 +104,9 @@ class BacktestingEngine(object):
         if endDate:
             self.dataEndDate= datetime.strptime(endDate, '%Y%m%d')
             # 若不修改时间则会导致不包含dataEndDate当天数据
-            self.dataEndDate.replace(hour=23, minute=59)    
-        
-    #----------------------------------------------------------------------
+            self.dataEndDate.replace(hour=23, minute=59)
+
+        #----------------------------------------------------------------------
     def setBacktestingMode(self, mode):
         """设置回测模式"""
         self.mode = mode
