@@ -87,11 +87,11 @@ CURRENCY_NONE = ''              # 空货币
 
 # 数据库
 LOG_DB_NAME = 'InplusTrader_Log_Db'
-
 SETTING_DB_NAME = 'InplusTrader_Setting_Db'
 POSITION_DB_NAME = 'InplusTrader_Position_Db'
+CAPITAL_DB_NAME = 'InplusTrader_Capital_Db'
 
 # TICK_DB_NAME = 'InplusTrader_Futures_Tick_Db'
 TICK_DB_NAME = 'InFintech_Db'
-DAILY_DB_NAME = 'InplusTrader_Futures_Day_Db'
 MINUTE_DB_NAME = 'InplusTrader_Futures_Min_Db'
+DAILY_DB_NAME = 'InplusTrader_Futures_Day_Db'

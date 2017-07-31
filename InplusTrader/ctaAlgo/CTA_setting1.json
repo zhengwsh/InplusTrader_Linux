@@ -15,8 +15,6 @@
         "className": "PairTradingStrategy1",
         "author": "Vinson Zheng",
         "vtSymbol": "I88",
-        "vtSymbol1": "I88",
-        "StartTime": "2014-12-23 13:31:00",
-        "EndTime": "2014-12-23 14:20:00"
+        "vtSymbol1": "RB88"
     }
 ]

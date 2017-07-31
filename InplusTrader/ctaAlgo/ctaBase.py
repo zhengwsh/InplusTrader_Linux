@@ -28,16 +28,19 @@ STOPORDER_TRIGGERED = u'已触发'
 STOPORDERPREFIX = 'CtaStopOrder.'
 
 # 数据库名称
+LOG_DB_NAME = 'InplusTrader_Log_Db'
 SETTING_DB_NAME = 'InplusTrader_Setting_Db'
 POSITION_DB_NAME = 'InplusTrader_Position_Db'
+CAPITAL_DB_NAME = 'InplusTrader_Capital_Db'
+
 
 # TICK_DB_NAME = 'InplusTrader_Tick_Db'
 # DAILY_DB_NAME = 'InplusTrader_Daily_Db'
 # MINUTE_DB_NAME = 'InplusTrader_1Min_Db'
 
 TICK_DB_NAME = 'InFintech_Db'
-DAILY_DB_NAME = 'InplusTrader_Futures_Day_Db'
 MINUTE_DB_NAME = 'InplusTrader_Futures_Min_Db'
+DAILY_DB_NAME = 'InplusTrader_Futures_Day_Db'
 
 # 引擎类型，用于区分当前策略的运行环境
 ENGINETYPE_BACKTESTING = 'backtesting'  # 回测
@@ -76,18 +79,35 @@ class CtaBarData(object):
         self.vtSymbol = EMPTY_STRING        # vt系统代码
         self.symbol = EMPTY_STRING          # 代码
         self.exchange = EMPTY_STRING        # 交易所
-    
+
         self.open = EMPTY_FLOAT             # OHLC
         self.high = EMPTY_FLOAT
         self.low = EMPTY_FLOAT
         self.close = EMPTY_FLOAT
-        
+
         self.date = EMPTY_STRING            # bar开始的时间，日期
         self.time = EMPTY_STRING            # 时间
         self.datetime = None                # python的datetime时间对象
-        
+
         self.volume = EMPTY_INT             # 成交量
         self.openInterest = EMPTY_INT       # 持仓量
+
+
+########################################################################
+class CtaBarData1(object):
+    """DB K线数据"""
+
+    # ----------------------------------------------------------------------
+    def __init__(self):
+        """Constructor"""
+        self.open = EMPTY_FLOAT  # OHLC
+        self.high = EMPTY_FLOAT
+        self.low = EMPTY_FLOAT
+        self.close = EMPTY_FLOAT
+        self.date = EMPTY_STRING  # bar开始的时间，日期
+        self.time = EMPTY_STRING  # 时间
+        self.datetime = EMPTY_STRING
+        self.volume = EMPTY_INT  # 成交量
 
 
 ########################################################################
@@ -142,7 +162,7 @@ class CtaTickData(object):
 
 ########################################################################
 class CtaTickData1(object):
-    """Tick数据"""
+    """DB Tick数据"""
 
     #----------------------------------------------------------------------
     def __init__(self):
@@ -165,3 +185,18 @@ class CtaTickData1(object):
         self.limit_down = EMPTY_FLOAT
         self.total_volume = EMPTY_INT
 
+
+########################################################################
+class CtaCapData(object):
+    """Capital 数据"""
+
+    #----------------------------------------------------------------------
+    def __init__(self):
+        """Constructor"""
+        self.name = EMPTY_STRING
+        self.datetime = None
+        self.start = None
+        self.date = None
+        self.cap = EMPTY_FLOAT
+        self.pnl = EMPTY_FLOAT
+        self.drawdown = EMPTY_FLOAT

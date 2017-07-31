@@ -15,7 +15,8 @@ class CtaTemplate1(object):
     """CTA策略模板"""
 
     # 策略类的名称和作者
-    className = 'CtaTemplate'
+    name = EMPTY_UNICODE  # 策略实例名称
+    className = 'CtaTemplate1'
     author = EMPTY_UNICODE
 
     # MongoDB数据库的名称，K线数据库默认为1分钟
@@ -26,7 +27,6 @@ class CtaTemplate1(object):
     currency = EMPTY_STRING  # 货币（只有IB接口需
 
     # 策略的基本参数
-    name = EMPTY_UNICODE  # 策略实例名称
     vtSymbol = EMPTY_STRING  # 交易的合约vt系统代码
     vtSymbol1 = EMPTY_STRING  # 交易的合约2vt系统代码
 
@@ -64,9 +64,6 @@ class CtaTemplate1(object):
     def __init__(self, ctaEngine, setting):
         """Constructor"""
         self.ctaEngine = ctaEngine
-
-        self.productClass = EMPTY_STRING  # 产品类型（只有IB接口需要）
-        self.currency = EMPTY_STRING  # 货币（只有IB接口需
 
         # 策略的基本变量，由引擎管理
         self.inited = False  # 是否进行了初始化
@@ -607,7 +604,7 @@ class CtaTemplate1(object):
             if stop:
                 vtOrderID = self.ctaEngine.sendStopOrder(self.vtSymbol1, orderType, price, volume, self)
             else:
-                vtOrderID = self.ctaEngine.sendOrder(self.vtSymbol1, orderType, price, volume, self)
+                vtOrderID = self.ctaEngine.sendOrder(self.vtSymbol, orderType, price, volume, self)
             return vtOrderID
         else:
             return ''

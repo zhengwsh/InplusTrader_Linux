@@ -8,6 +8,7 @@ from __future__ import division
 from itertools import product
 import copy
 import os
+import sys
 import re
 import csv
 import time
@@ -26,8 +27,6 @@ from ctaBase import *
 from vtConstant import *
 from vtGateway import VtOrderData, VtTradeData
 from vtFunction import loadMongoSetting
-
-CAPITAL_DB_NAME = 'InplusTrader_Cap_Db'
 
 
 ########################################################################
@@ -59,6 +58,8 @@ class BacktestingEngine(object):
 
         # 回测相关
         self.strategy = None  # 回测策略
+        self.vtSymbol = None
+        self.vtSymbol1 = None
         self.mode = self.BAR_MODE  # 回测模式，默认为K线
         self.shfe = True  # 上期所
         self.fast = False  # 是否支持排队
@@ -67,8 +68,10 @@ class BacktestingEngine(object):
         self.plotfile = False
         self.optimism = False
 
-        self.leverage = 0.07
+        self.leverage = 0.07 # 杠杠比率
+        self.leverage1 = 0.07 # 杠杠比率
         self.slippage = 0  # 回测时假设的滑点
+        self.slippage1 = 0  # 回测时假设的滑点
         self.rate = 0  # 回测时假设的佣金比例（适用于百分比佣金）
         self.rate1 = 0  # 回测时假设的佣金比例（适用于百分比佣金）
         self.size = 1  # 合约大小，默认为1
@@ -127,23 +130,29 @@ class BacktestingEngine(object):
         self.lasttick1 = None
         self.bar = None
         self.bar1 = None
+        self.lastbar = None
+        self.lastbar1 = None
         self.dt = None  # 最新的时间
 
     # ----------------------------------------------------------------------
-    def setStartDate(self, startDate='20100416', initDays=10):
+    def setStartDate(self, startDate='20170501'):
         """设置回测的启动日期
            支持两种日期模式"""
         if len(startDate) == 8:
             self.dataStartDate = datetime.strptime(startDate, '%Y%m%d')
+        elif len(startDate) == 10:
+            self.dataStartDate = datetime.strptime(startDate, '%Y-%m-%d')
         else:
             self.dataStartDate = datetime.strptime(startDate, '%Y-%m-%d %H:%M:%S') #'%Y%m%d %H:%M:%S'
 
     # ----------------------------------------------------------------------
-    def setEndDate(self, endDate='20100416'):
+    def setEndDate(self, endDate='20170501'):
         """设置回测的结束日期
            支持两种日期模式"""
         if len(endDate) == 8:
             self.dataEndDate = datetime.strptime(endDate, '%Y%m%d')
+        elif len(endDate) == 10:
+            self.dataEndDate = datetime.strptime(endDate, '%Y-%m-%d')
         else:
             self.dataEndDate = datetime.strptime(endDate, '%Y-%m-%d %H:%M:%S')
 
@@ -153,6 +162,7 @@ class BacktestingEngine(object):
         self.mode = mode
         if self.mode == self.BAR_MODE:
             self.dataClass = CtaBarData
+            self._dataClass = CtaBarData1
         else:
             self.dataClass = CtaTickData
             self._dataClass = CtaTickData1
@@ -160,10 +170,8 @@ class BacktestingEngine(object):
     # ----------------------------------------------------------------------
     def loadHistoryData1(self, dbName, symbol):
         """载入历史数据"""
-        symbol = 'I88tick'
-        # host, port = loadMongoSetting()
-        host = 'localhost'
-        port = 27017
+        # symbol = 'I88tick'
+        host, port, logging = loadMongoSetting()
         if not self.dbClient:
             self.dbClient = pymongo.MongoClient(host, port, socketKeepAlive=True)
         collection = self.dbClient[dbName][symbol]
@@ -178,15 +186,15 @@ class BacktestingEngine(object):
             func = self.newTick1
 
         # 载入回测数据
-        self.dataStartDate = "2017-06-20 21:00:00.5" # "2014-12-23 13:31:00"
-        self.dataEndDate = "2017-06-20 21:00:25.0" # "2014-12-23 14:20:00"
+        fltStartDate = self.dataStartDate.strftime("%Y-%m-%d %H:%M:%S")
+        fltEndDate = self.dataEndDate.strftime("%Y-%m-%d %H:%M:%S")
         self.output("Start : " + str(self.dataStartDate))
         self.output("End : " + str(self.dataEndDate))
         if not self.dataEndDate:
-            flt = {'datetime': {'$gte': self.dataStartDate}}  # 数据过滤条件
+            flt = {'datetime': {'$gte': fltStartDate}}  # 数据过滤条件
         else:
-            flt = {'datetime': {'$gte': self.dataStartDate,
-                                '$lte': self.dataEndDate}}
+            flt = {'datetime': {'$gte': fltStartDate,
+                                '$lte': fltEndDate}}
         self.dbCursor1 = collection.find(flt, no_cursor_timeout=True).batch_size(self.bufferSize)
 
         self.output(u'载入完成，数据量：%s' % (self.dbCursor1.count()))
@@ -195,10 +203,8 @@ class BacktestingEngine(object):
     # ----------------------------------------------------------------------
     def loadHistoryData(self, dbName, symbol):
         """载入历史数据"""
-        symbol = 'I88tick'
-        # host, port = loadMongoSetting()
-        host = 'localhost'
-        port = 27017
+        # symbol = 'I88tick'
+        host, port, logging = loadMongoSetting()
         if not self.dbClient:
             self.dbClient = pymongo.MongoClient(host, port, socketKeepAlive=True)
         collection = self.dbClient[dbName][symbol]
@@ -213,15 +219,15 @@ class BacktestingEngine(object):
             func = self.newTick
 
         # 载入回测数据
-        self.dataStartDate = "2017-06-20 21:00:00.5"
-        self.dataEndDate = "2017-06-20 21:00:25.0"
+        fltStartDate = self.dataStartDate.strftime("%Y-%m-%d %H:%M:%S")
+        fltEndDate = self.dataEndDate.strftime("%Y-%m-%d %H:%M:%S")
         self.output("Start : " + str(self.dataStartDate))
         self.output("End : " + str(self.dataEndDate))
         if not self.dataEndDate:
-            flt = {'datetime': {'$gte': self.dataStartDate}}  # 数据过滤条件
+            flt = {'datetime': {'$gte': fltStartDate}}  # 数据过滤条件
         else:
-            flt = {'datetime': {'$gte': self.dataStartDate,
-                                '$lte': self.dataEndDate}}
+            flt = {'datetime': {'$gte': fltStartDate,
+                                '$lte': fltEndDate}}
         self.dbCursor = collection.find(flt, no_cursor_timeout=True).batch_size(self.bufferSize)
 
         self.output(u'载入完成，数据量：%s' % (self.dbCursor.count()))
@@ -236,22 +242,35 @@ class BacktestingEngine(object):
             data = self.dataClass()
             _data.__dict__ = d
 
-            data.vtSymbol = 'I88'
-            data.lastPrice = _data.price  # 最新成交价
-            data.volume = _data.volume  # 最新成交量
-            data.openInterest = _data.open_interest  # 持仓量
+            if self.mode == 'tick':
+                data.vtSymbol = self.strategy.vtSymbol #'I88'
+                data.lastPrice = _data.price  # 最新成交价
+                data.volume = _data.volume  # 最新成交量
+                data.openInterest = _data.open_interest  # 持仓量
 
-            data.upperLimit = _data.limit_up  # 涨停价
-            data.lowerLimit = _data.limit_down  # 跌停价
+                data.upperLimit = _data.limit_up  # 涨停价
+                data.lowerLimit = _data.limit_down  # 跌停价
 
-            data.date = _data.date  # 日期
-            data.time = _data.time  # 时间
-            data.datetime = datetime.strptime(_data.datetime, "%Y-%m-%d %H:%M:%S.%f")  # python的datetime时间对象
+                data.bidPrice1 = _data.bidPrice1
+                data.askPrice1 = _data.askPrice1
+                data.bidVolume1 = _data.bidVolume1
+                data.askVolume1 = _data.askVolume1
 
-            data.bidPrice1 = _data.bidPrice1
-            data.askPrice1 = _data.askPrice1
-            data.bidVolume1 = _data.bidVolume1
-            data.askVolume1 = _data.askVolume1
+                data.date = _data.date  # 日期
+                data.time = _data.time  # 时间
+                data.datetime = datetime.strptime(_data.datetime, "%Y-%m-%d %H:%M:%S.%f")  # python的datetime时间对象
+
+            elif self.mode == 'bar':
+                data.vtSymbol = self.strategy.vtSymbol  # 'I88'
+                data.open = _data.open
+                data.high = _data.high
+                data.low = _data.low
+                data.close = _data.close
+                data.volume = _data.volume
+
+                data.date = _data.date  # 日期
+                data.time = _data.time  # 时间
+                data.datetime = datetime.strptime(_data.datetime, "%Y-%m-%d %H:%M:%S")  # python的datetime时间对象
 
             self.backtestingData.append(data)
             self.j += 1
@@ -261,22 +280,35 @@ class BacktestingEngine(object):
             data1 = self.dataClass()
             _data.__dict__ = d1
 
-            data1.vtSymbol = 'I88'
-            data1.lastPrice = _data.price  # 最新成交价
-            data1.volume = _data.volume  # 最新成交量
-            data1.openInterest = _data.open_interest  # 持仓量
+            if self.mode == 'tick':
+                data1.vtSymbol = self.strategy.vtSymbol1 #'I88'
+                data1.lastPrice = _data.price  # 最新成交价
+                data1.volume = _data.volume  # 最新成交量
+                data1.openInterest = _data.open_interest  # 持仓量
 
-            data1.upperLimit = _data.limit_up  # 涨停价
-            data1.lowerLimit = _data.limit_down  # 跌停价
+                data1.upperLimit = _data.limit_up  # 涨停价
+                data1.lowerLimit = _data.limit_down  # 跌停价
 
-            data1.date = _data.date  # 日期
-            data1.time = _data.time  # 时间
-            data1.datetime = datetime.strptime(_data.datetime, "%Y-%m-%d %H:%M:%S.%f")  # python的datetime时间对象
+                data1.bidPrice1 = _data.bidPrice1
+                data1.askPrice1 = _data.askPrice1
+                data1.bidVolume1 = _data.bidVolume1
+                data1.askVolume1 = _data.askVolume1
 
-            data1.bidPrice1 = _data.bidPrice1
-            data1.askPrice1 = _data.askPrice1
-            data1.bidVolume1 = _data.bidVolume1
-            data1.askVolume1 = _data.askVolume1
+                data1.date = _data.date  # 日期
+                data1.time = _data.time  # 时间
+                data1.datetime = datetime.strptime(_data.datetime, "%Y-%m-%d %H:%M:%S.%f")  # python的datetime时间对象
+
+            elif self.mode == 'bar':
+                data1.vtSymbol = self.strategy.vtSymbol1  # 'I88'
+                data1.open = _data.open
+                data1.high = _data.high
+                data1.low = _data.low
+                data1.close = _data.close
+                data1.volume = _data.volume
+
+                data1.date = _data.date  # 日期
+                data1.time = _data.time  # 时间
+                data1.datetime = datetime.strptime(_data.datetime, "%Y-%m-%d %H:%M:%S")  # python的datetime时间对象
 
             self.backtestingData1.append(data1)
             self.i += 1
@@ -297,11 +329,13 @@ class BacktestingEngine(object):
             self.dataClass = CtaBarData
             func = self.newBar
             func1 = self.newBar1
+            func2 = self.newBar01
         else:
             self.dataClass = CtaTickData
             func = self.newTick
             func1 = self.newTick1
             func2 = self.newTick01
+        self.output(u'-' * 30)
         self.output(u'开始回测')
 
         self.strategy.inited = True
@@ -312,7 +346,6 @@ class BacktestingEngine(object):
         self.strategy.onStart()
         self.output(u'策略启动完成')
 
-        self.output(u'开始回放双合约数据')
         dbCursor_count = self.dbCursor.count()
         dbCursor_count1 = self.dbCursor1.count()
         self.i = 0;
@@ -320,6 +353,7 @@ class BacktestingEngine(object):
         lastData = None
         lastData1 = None
         t = None
+        self.output(u'开始回放双合约数据')
         # 双合约回测
         while (self.i < dbCursor_count1 and self.j < dbCursor_count) or (
             self.backtestingData and self.backtestingData1):
@@ -405,6 +439,27 @@ class BacktestingEngine(object):
         self.dt = bar.datetime
         self.crossLimitOrder1()  # 先撮合限价单
         self.strategy.onBar(bar)  # 推送K线到策略中
+
+    # ----------------------------------------------------------------------
+    def newBar01(self, bar, bar1):
+        """新的Bar"""
+        self.dt = bar.datetime
+        self.bar = bar
+        self.bar1 = bar1
+        # 低速模式（延时1个Tick撮合）
+        self.crossBarLimitOrder1()
+        self.crossBarLimitOrder()
+        # 没有切片的合约不发送行情（为了和实盘一致）
+        if bar1.datetime >= bar.datetime:
+            self.strategy.onBar(self.bar1)
+        if bar.datetime >= bar1.datetime:
+            self.strategy.onBar(self.bar)
+        # 高速模式（直接撮合）
+        if self.optimism:
+            self.crossBarLimitOrder1()
+            self.crossBarLimitOrder()
+        self.lastbar = self.bar
+        self.lastbar1 = self.bar1
 
     # ----------------------------------------------------------------------
     def newTick(self, tick):
@@ -801,6 +856,7 @@ class BacktestingEngine(object):
         # 缓存数据
         tick = self.tick
         lasttick = self.lasttick
+        bar = self.bar
         # 过滤数据
         if self.filterTradeTime():
             return
@@ -808,8 +864,8 @@ class BacktestingEngine(object):
         # 确定撮合价格
         if self.mode == self.BAR_MODE:
             # Bar价格撮合，目前不支持FokopenFak
-            buyCrossPrice = self.bar.low  # 若买入方向限价单价格高于该价格，则会成交
-            sellCrossPrice = self.bar.high  # 若卖出方向限价单价格低于该价格，则会成交
+            buyCrossPrice = bar.low  # 若买入方向限价单价格高于该价格，则会成交
+            sellCrossPrice = bar.high  # 若卖出方向限价单价格低于该价格，则会成交
         else:
             # Tick采用对价撮合，支持Fok，Fak
             buyCrossPrice = tick.askPrice1 if tick.askPrice1 > 0 else tick.bidPrice1 + self.mPrice
@@ -1050,6 +1106,128 @@ class BacktestingEngine(object):
                     self.strategy.onOrder(order)
 
     # ----------------------------------------------------------------------
+    def crossBarLimitOrder(self):
+        """基于最新数据撮合限价单"""
+        # 先确定会撮合成交的价格
+        if self.mode == self.BAR_MODE:
+            buyCrossPrice = self.bar.low  # 若买入方向限价单价格高于该价格，则会成交
+            sellCrossPrice = self.bar.high  # 若卖出方向限价单价格低于该价格，则会成交
+            buyBestCrossPrice = self.bar.open  # 在当前时间点前发出的买入委托可能的最优成交价
+            sellBestCrossPrice = self.bar.open  # 在当前时间点前发出的卖出委托可能的最优成交价
+        else:
+            buyCrossPrice = self.tick.askPrice1
+            sellCrossPrice = self.tick.bidPrice1
+            buyBestCrossPrice = self.tick.askPrice1
+            sellBestCrossPrice = self.tick.bidPrice1
+
+        # 遍历限价单字典中的所有限价单
+        for orderID, order in self.workingLimitOrderDict.items():
+            # 判断是否会成交
+            buyCross = order.direction == DIRECTION_LONG and order.price >= buyCrossPrice
+            sellCross = order.direction == DIRECTION_SHORT and order.price <= sellCrossPrice
+
+            # 如果发生了成交
+            if buyCross or sellCross:
+                # 推送成交数据
+                self.tradeCount += 1  # 成交编号自增1
+                tradeID = str(self.tradeCount)
+                trade = VtTradeData()
+                trade.vtSymbol = order.vtSymbol
+                trade.tradeID = tradeID
+                trade.vtTradeID = tradeID
+                trade.orderID = order.orderID
+                trade.vtOrderID = order.orderID
+                trade.direction = order.direction
+                trade.offset = order.offset
+
+                # 以买入为例：
+                # 1. 假设当根K线的OHLC分别为：100, 125, 90, 110
+                # 2. 假设在上一根K线结束(也是当前K线开始)的时刻，策略发出的委托为限价105
+                # 3. 则在实际中的成交价会是100而不是105，因为委托发出时市场的最优价格是100
+                if buyCross:
+                    trade.price = min(order.price, buyBestCrossPrice)
+                    self.strategy.pos += order.totalVolume
+                else:
+                    trade.price = max(order.price, sellBestCrossPrice)
+                    self.strategy.pos -= order.totalVolume
+
+                trade.volume = order.totalVolume
+                trade.tradeTime = str(self.dt)
+                trade.dt = self.dt
+                self.strategy.onTrade(trade)
+
+                self.tradeDict[tradeID] = trade
+
+                # 推送委托数据
+                order.tradedVolume = order.totalVolume
+                order.status = STATUS_ALLTRADED
+                self.strategy.onOrder(order)
+
+                # 从字典中删除该限价单
+                del self.workingLimitOrderDict[orderID]
+
+    # ----------------------------------------------------------------------
+    def crossBarLimitOrder1(self):
+        """基于最新数据撮合限价单"""
+        # 先确定会撮合成交的价格
+        if self.mode == self.BAR_MODE:
+            buyCrossPrice = self.bar.low  # 若买入方向限价单价格高于该价格，则会成交
+            sellCrossPrice = self.bar.high  # 若卖出方向限价单价格低于该价格，则会成交
+            buyBestCrossPrice = self.bar.open  # 在当前时间点前发出的买入委托可能的最优成交价
+            sellBestCrossPrice = self.bar.open  # 在当前时间点前发出的卖出委托可能的最优成交价
+        else:
+            buyCrossPrice = self.tick.askPrice1
+            sellCrossPrice = self.tick.bidPrice1
+            buyBestCrossPrice = self.tick.askPrice1
+            sellBestCrossPrice = self.tick.bidPrice1
+
+        # 遍历限价单字典中的所有限价单
+        for orderID, order in self.workingLimitOrderDict.items():
+            # 判断是否会成交
+            buyCross = order.direction == DIRECTION_LONG and order.price >= buyCrossPrice
+            sellCross = order.direction == DIRECTION_SHORT and order.price <= sellCrossPrice
+
+            # 如果发生了成交
+            if buyCross or sellCross:
+                # 推送成交数据
+                self.tradeCount += 1  # 成交编号自增1
+                tradeID = str(self.tradeCount)
+                trade = VtTradeData()
+                trade.vtSymbol = order.vtSymbol
+                trade.tradeID = tradeID
+                trade.vtTradeID = tradeID
+                trade.orderID = order.orderID
+                trade.vtOrderID = order.orderID
+                trade.direction = order.direction
+                trade.offset = order.offset
+
+                # 以买入为例：
+                # 1. 假设当根K线的OHLC分别为：100, 125, 90, 110
+                # 2. 假设在上一根K线结束(也是当前K线开始)的时刻，策略发出的委托为限价105
+                # 3. 则在实际中的成交价会是100而不是105，因为委托发出时市场的最优价格是100
+                if buyCross:
+                    trade.price = min(order.price, buyBestCrossPrice)
+                    self.strategy.pos += order.totalVolume
+                else:
+                    trade.price = max(order.price, sellBestCrossPrice)
+                    self.strategy.pos -= order.totalVolume
+
+                trade.volume = order.totalVolume
+                trade.tradeTime = str(self.dt)
+                trade.dt = self.dt
+                self.strategy.onTrade(trade)
+
+                self.tradeDict[tradeID] = trade
+
+                # 推送委托数据
+                order.tradedVolume = order.totalVolume
+                order.status = STATUS_ALLTRADED
+                self.strategy.onOrder(order)
+
+                # 从字典中删除该限价单
+                del self.workingLimitOrderDict[orderID]
+
+    # ----------------------------------------------------------------------
     def crossStopOrder(self):
         """基于最新数据撮合停止单"""
         # 停止单撮合未更新
@@ -1122,6 +1300,7 @@ class BacktestingEngine(object):
 
                 # ----------------------------------------------------------------------
 
+    # ----------------------------------------------------------------------
     def insertData(self, dbName, collectionName, data):
         """考虑到回测中不允许向数据库插入数据，防止实盘交易中的一些代码出错"""
         pass
@@ -1702,20 +1881,21 @@ class BacktestingEngine(object):
         drawdownList = d['drawdownList']
         resList = d['resList']
 
+        self.output(u' ')
+        self.output('-' * 30)
         self.output(u'显示回测结果')
         # 输出
         if len(resList) > 1:
             import codecs
-            settingFileName = self.strategy.name + '_DT_setting.json'
-            if os.path.exists(os.getcwd() + '\\..\\dataViewer\\data\\'):
-                settingFileName = os.getcwd() + '\\..\\dataViewer\\data\\' + settingFileName
+            if os.path.exists('./ctaStrategy/opResults/'):
+                filepath = './ctaStrategy/opResults/'
             else:
-                settingFileName = os.getcwd() + '\\dataViewer\\data\\' + settingFileName
+                filepath = './opResults/'
+            settingFileName = filepath + self.strategy.name + '.json'
             f = codecs.open(settingFileName, 'w', 'utf-8')
             f.write(json.dumps(resList, indent=1, ensure_ascii=False))
             f.close()
         if len(timeList) > 0:
-            self.output('-' * 30)
             self.output(u'第一笔交易：\t%s' % d['timeList'][0])
             self.output(u'最后一笔交易：\t%s' % d['timeList'][-1])
 
@@ -1797,7 +1977,7 @@ class BacktestingEngine(object):
     # ----------------------------------------------------------------------
     def insertCap(self, dbName, collectionName, d):
         """插入数据到数据库（这里的data可以是CtaTickData或者CtaBarData）"""
-        host, port = loadMongoSetting()
+        host, port, logging = loadMongoSetting()
         if not self.dbClient:
             self.dbClient = pymongo.MongoClient(host, port, socketKeepAlive=True)
         db = self.dbClient[dbName]
@@ -1808,6 +1988,7 @@ class BacktestingEngine(object):
 
         # ----------------------------------------------------------------------
 
+    # ----------------------------------------------------------------------
     def showBacktestingResult_nograph(self, filepath):
         """
         显示回测结果
@@ -1902,6 +2083,10 @@ class BacktestingEngine(object):
     def setSlippage(self, slippage):
         """设置滑点"""
         self.slippage = slippage
+
+    # ----------------------------------------------------------------------
+    def setSlippage1(self, slippage):
+        """设置滑点"""
         self.slippage1 = slippage
 
     # ----------------------------------------------------------------------
@@ -1930,6 +2115,11 @@ class BacktestingEngine(object):
         self.leverage = leverage
 
     # ----------------------------------------------------------------------
+    def setLeverage1(self, leverage):
+        """设置杠杆比率"""
+        self.leverage1 = leverage
+
+    # ----------------------------------------------------------------------
     def setPrice(self, price):
         """设置合约大小"""
         self.mPrice = price
@@ -1945,7 +2135,7 @@ class BacktestingEngine(object):
         startDate = datetime.now()
 
         d = {'datetime': {'$lte': startDate}}
-        host, port = loadMongoSetting()
+        host, port, logging = loadMongoSetting()
         client = pymongo.MongoClient(host, port)
         collection = client[dbName][collectionName]
 
@@ -1962,12 +2152,13 @@ class BacktestingEngine(object):
 
         # ----------------------------------------------------------------------
 
+    # ----------------------------------------------------------------------
     def loadBar(self, dbName, collectionName, days):
         """从数据库中读取Bar数据，startDate是datetime对象"""
         startDate = datetime.now()
 
         d = {'datetime': {'$lte': startDate}}
-        host, port = loadMongoSetting()
+        host, port, logging = loadMongoSetting()
         client = pymongo.MongoClient(host, port)
         collection = client[dbName][collectionName]
 
@@ -1984,6 +2175,7 @@ class BacktestingEngine(object):
 
         # ----------------------------------------------------------------------
 
+    # ----------------------------------------------------------------------
     def runOptimization(self, strategyClass, setting_c, optimizationSetting):
         """串行优化"""
         # 获取优化设置        
@@ -2039,10 +2231,10 @@ class BacktestingEngine(object):
             opResults.append(opResult)
 
         # 显示结果
-        if os.path.exists('.\\ctaStrategy\\opResults\\'):
-            filepath = '.\\ctaStrategy\\opResults\\'
+        if os.path.exists('./ctaStrategy/opResults/'):
+            filepath = './ctaStrategy/opResults/'
         else:
-            filepath = '.\\opResults\\'
+            filepath = './opResults/'
         with open(filepath + self.strategy.name + '.csv', 'wb') as csvfile:
             fieldnames = opResult.keys()
             writer = csv.DictWriter(csvfile, fieldnames)
@@ -2202,9 +2394,6 @@ class OptimizationSetting(object):
 # ---------------------------------------------------------------------------------------
 def backtesting(setting_c, StartTime='', EndTime='', slippage=0, optimism=False, mode='T'):
     """读取策略配置"""
-    setting_c[u'backtesting'] = True
-    import sys
-    import re
     # from ctaSetting import STRATEGY_CLASS
     from strategy import STRATEGY_CLASS
     from ctaBacktesting1 import BacktestingEngine
@@ -2220,6 +2409,7 @@ def backtesting(setting_c, StartTime='', EndTime='', slippage=0, optimism=False,
             name = setting[u'name']
             match = re.search('^' + name + '[0-9]', vtSymbol)
             if match:
+                slippage = setting[u'mSlippage']
                 rate = setting[u'mRate']
                 price = setting[u'mPrice']
                 size = setting[u'mSize']
@@ -2227,6 +2417,7 @@ def backtesting(setting_c, StartTime='', EndTime='', slippage=0, optimism=False,
             if vtSymbol1:
                 match = re.search('^' + name + '[0-9]', vtSymbol1)
                 if match:
+                    slippage1 = setting[u'mSlippage']
                     rate1 = setting[u'mRate']
                     price1 = setting[u'mPrice']
                     size1 = setting[u'mSize']
@@ -2236,7 +2427,8 @@ def backtesting(setting_c, StartTime='', EndTime='', slippage=0, optimism=False,
     sys.stderr = output_s
     engine = BacktestingEngine()
     engine.optimism = optimism
-    # 设置引擎的回测模式为TICK
+    # 设置引擎的回测模式, 默认为Tick
+    dbName = TICK_DB_NAME
     if mode == 'T':
         engine.setBacktestingMode(engine.TICK_MODE)
         dbName = TICK_DB_NAME
@@ -2253,28 +2445,37 @@ def backtesting(setting_c, StartTime='', EndTime='', slippage=0, optimism=False,
         EndTime = str(setting_c[u'EndTime'])
 
     # 设置回测用的数据起始日期
-    engine.setStartDate(StartTime, 1)
+    engine.setStartDate(StartTime)
     engine.setEndDate(EndTime)
 
     # 载入历史数据到引擎中
+    print ' '
+    print ('-' * 30)
     engine.loadHistoryData(dbName, vtSymbol)
     if vtSymbol1:
         engine.loadHistoryData1(dbName, vtSymbol1)
 
     # 设置产品相关参数
+    # 合约1
     engine.setSlippage(slippage)  # 滑点
     engine.setRate(rate)  # 万1.1
     engine.setSize(size)  # 合约大小
     engine.setPrice(price)  # 最小价格变动
+    engine.setLeverage(level)  # 合约杠杆
+    # 合约2
     if vtSymbol1:
+        engine.setSlippage1(slippage1)  # 滑点
         engine.setRate1(rate1)  # 万1.1
         engine.setSize1(size1)  # 合约大小
         engine.setPrice1(price1)  # 最小价格变动
+        engine.setLeverage1(level1)  # 合约杠杆
     else:
+        engine.setSlippage1(slippage)  # 滑点
         engine.setRate1(rate)  # 万1.1
         engine.setSize1(size)  # 合约大小
         engine.setPrice1(price)  # 最小价格变动
-    engine.setLeverage(level)  # 合约杠杆
+        engine.setLeverage1(level)  # 合约杠杆
+
     engine.initStrategy(STRATEGY_CLASS[className], setting_c)
     engine.runBacktesting()
     engine.showBacktestingResult()
@@ -2423,7 +2624,7 @@ def optimize(setting_c, setting, targetName, optimism, startTime='', endTime='',
         startTime = str(setting_c[u'StartTime'])
     if not endTime:
         endTime = str(setting_c[u'EndTime'])
-    engine.setStartDate(startTime, 1)
+    engine.setStartDate(startTime)
     engine.setEndDate(endTime)
     engine.loadHistoryData(dbName, vtSymbol)
     if vtSymbol1:
@@ -2510,7 +2711,8 @@ if __name__ == '__main__':
         exit(0)
 
     # 开始回测
-    backtesting(setting_c, optimism=opt, mode='T')
+    backtesting(setting_c, StartTime= "2017-05-02 09:01:00",
+        EndTime = "2017-05-02 15:00:00", optimism=opt, mode='B')
     # runParallelOptimization(setting_c, optimizationSetting, optimism=opt, mode='T')
     end = datetime.now()
     print(u'回测用时: ' + str(end - begin))

@@ -468,7 +468,7 @@ class BacktestingEngine(object):
         计算回测结果
         """
         self.output(u'计算回测结果')
-        
+
         # 首先基于回测后的成交记录，计算每笔交易的盈亏
         resultList = []             # 交易结果列表
         

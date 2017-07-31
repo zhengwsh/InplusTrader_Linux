@@ -174,6 +174,10 @@ class PairTradingStrategy1(CtaTemplate1):
     def onBar(self, bar):
         """收到Bar推送（必须由用户继承实现）"""
         # print 'barSymbol:'+bar.vtSymbol+' barDateTime:'+bar.date+' '+bar.time+' barClose:'+str(bar.close)
+        self.buy(550, 1)
+        self.sell(500,1)
+        # self.buy1(3150, 1)
+        # self.sell1(3140, 1)
         # print self.vtSymbols[0] + " pos long : " + str(self.pos[self.vtSymbols[0]]["long"]) + " pos short : " + str(self.pos[self.vtSymbols[0]]["short"])
         # print self.vtSymbols[1] + " pos long : " + str(self.pos[self.vtSymbols[1]]["long"]) + " pos short : " + str(self.pos[self.vtSymbols[1]]["short"])
         # """
