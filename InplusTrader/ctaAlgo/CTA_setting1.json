@@ -16,5 +16,12 @@
         "author": "Vinson Zheng",
         "vtSymbol": "I88",
         "vtSymbol1": "RB88"
+    },
+    {
+        "name": "spread",
+        "className": "SpreadTradingStrategy",
+        "author": "Vinson Zheng",
+        "vtSymbol": "CU88",
+        "vtSymbol1": "ZN88"
     }
 ]

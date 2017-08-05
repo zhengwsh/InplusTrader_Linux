@@ -454,6 +454,7 @@ class BacktestingEngine(object):
             self.strategy.onBar(self.bar1)
         if bar.datetime >= bar1.datetime:
             self.strategy.onBar(self.bar)
+        self.strategy.onSpread()
         # 高速模式（直接撮合）
         if self.optimism:
             self.crossBarLimitOrder1()
@@ -537,24 +538,24 @@ class BacktestingEngine(object):
         if orderType == CTAORDER_BUY:
             order.direction = DIRECTION_LONG
             order.offset = OFFSET_OPEN
+        elif orderType == CTAORDER_SHORT:
+            order.direction = DIRECTION_SHORT
+            order.offset = OFFSET_OPEN
         elif orderType == CTAORDER_SELL and not self.shfe:
             order.direction = DIRECTION_SHORT
             order.offset = OFFSET_CLOSE
         elif orderType == CTAORDER_SELL and self.shfe:
             order.direction = DIRECTION_SHORT
             order.offset = OFFSET_CLOSEYESTERDAY
-        elif orderType == CTAORDER_SELL_TODAY:
-            order.direction = DIRECTION_SHORT
-            order.offset = OFFSET_CLOSETODAY
-        elif orderType == CTAORDER_SHORT:
-            order.direction = DIRECTION_SHORT
-            order.offset = OFFSET_OPEN
         elif orderType == CTAORDER_COVER and not self.shfe:
             order.direction = DIRECTION_LONG
             order.offset = OFFSET_CLOSE
         elif orderType == CTAORDER_COVER and self.shfe:
             order.direction = DIRECTION_LONG
             order.offset = OFFSET_CLOSEYESTERDAY
+        elif orderType == CTAORDER_SELL_TODAY:
+            order.direction = DIRECTION_SHORT
+            order.offset = OFFSET_CLOSETODAY
         elif orderType == CTAORDER_COVER_TODAY:
             order.direction = DIRECTION_LONG
             order.offset = OFFSET_CLOSETODAY
@@ -1217,7 +1218,7 @@ class BacktestingEngine(object):
                 trade.dt = self.dt
                 self.strategy.onTrade(trade)
 
-                self.tradeDict[tradeID] = trade
+                self.tradeDict1[tradeID] = trade
 
                 # 推送委托数据
                 order.tradedVolume = order.totalVolume
@@ -1275,6 +1276,7 @@ class BacktestingEngine(object):
                 self.strategy.onTrade(copy.copy(trade))
 
                 self.tradeDict[tradeID] = trade
+                self.tradeDict1[tradeID] = trade
 
                 # 推送委托数据
                 so.status = STOPORDER_TRIGGERED
@@ -2681,7 +2683,7 @@ if __name__ == '__main__':
     begin = datetime.now()
 
     # 回测策略选择
-    name = 'pair trading'  # tl for rb
+    name = 'spread'
     setting_c = getSetting(name)
 
     # 回测模式设置
@@ -2691,9 +2693,9 @@ if __name__ == '__main__':
 
 
     # 策略参数设置
-    optimizationSetting = OptimizationSetting()
-    optimizationSetting.addParameter('wLimit', 3, 4, 1) # 3, 6, 1
-    optimizationSetting.setOptimizeTarget('wLimit')
+    # optimizationSetting = OptimizationSetting()
+    # optimizationSetting.addParameter('wLimit', 3, 4, 1) # 3, 6, 1
+    # optimizationSetting.setOptimizeTarget('wLimit')
 
     # 确认检查
     print(u'即将开始优化回测，请确认下面的信息正确后开始回测：')
@@ -2711,8 +2713,8 @@ if __name__ == '__main__':
         exit(0)
 
     # 开始回测
-    backtesting(setting_c, StartTime= "2017-05-02 09:01:00",
-        EndTime = "2017-05-02 15:00:00", optimism=opt, mode='B')
+    backtesting(setting_c, StartTime= "2017-05-19 21:01:00",
+        EndTime = "2017-06-19 15:00:00", optimism=opt, mode='B')
     # runParallelOptimization(setting_c, optimizationSetting, optimism=opt, mode='T')
     end = datetime.now()
     print(u'回测用时: ' + str(end - begin))

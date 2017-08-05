@@ -604,7 +604,7 @@ class CtaTemplate1(object):
             if stop:
                 vtOrderID = self.ctaEngine.sendStopOrder(self.vtSymbol1, orderType, price, volume, self)
             else:
-                vtOrderID = self.ctaEngine.sendOrder(self.vtSymbol, orderType, price, volume, self)
+                vtOrderID = self.ctaEngine.sendOrder(self.vtSymbol1, orderType, price, volume, self)
             return vtOrderID
         else:
             return ''

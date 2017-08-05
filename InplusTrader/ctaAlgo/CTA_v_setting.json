@@ -14,5 +14,21 @@
         "mPrice": 1,
         "mSize": 1,
         "mLevel": 0.07
+    },
+    {
+        "name": "CU",
+        "mSlippage" : 0,
+        "mRate": 0,
+        "mPrice": 1,
+        "mSize": 1,
+        "mLevel": 0.07
+    },
+    {
+    	"name": "ZN",
+        "mSlippage" : 0,
+        "mRate": 0,
+        "mPrice": 1,
+        "mSize": 1,
+        "mLevel": 0.07
     }
 ]
